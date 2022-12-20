@@ -1,0 +1,19 @@
+﻿@if (MenuItem is not null)
+{
+    @if (MenuItem.Childs is not null && MenuItem.Childs.Count > 0)
+    {
+        <MudNavGroup Title=@MenuItem.DisplayName Expanded="true">
+            @foreach (var item in MenuItem.Childs)
+            {
+                <NavMenuItem MenuItem=@item />
+            }
+        </MudNavGroup>
+    }
+    else
+    {
+        <MudNavLink OnClick="@((e) => NavTo(MenuItem.Href, false))" Match="NavLinkMatch.All">@MenuItem.DisplayName</MudNavLink>
+    }
+}
+
+@code {
+}

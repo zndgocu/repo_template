@@ -1,0 +1,38 @@
+﻿@inherits LayoutComponentBase
+
+
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+
+<div id="loading">
+    <div class="spinner" />
+</div>
+
+<MudLayout>
+    <AppBar @ref="@_appBar" ToggleChanged="@((e) => OnToggleChanged(e))"></AppBar>
+    <MudDrawer @bind-Open="@_toggle" ClipMode="DrawerClipMode.Always" Elevation="2">
+        <CascadingValue Value="@MatIconProviderService">
+            <CascadingValue Value="@JsProviderService">
+                <CascadingValue Value="@HttpService">
+                    <CascadingValue Value="@Snackbar">
+                        <NavMenu @ref="@_navMenu" />
+                    </CascadingValue>
+                </CascadingValue>
+            </CascadingValue>
+        </CascadingValue>
+    </MudDrawer>
+    <MudMainContent Style="height:100vh;">
+        <CascadingValue Value="@MatIconProviderService">
+            <CascadingValue Value="@JsProviderService">
+                <CascadingValue Value="@Snackbar">
+                    @Body
+                </CascadingValue>
+            </CascadingValue>
+        </CascadingValue>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+}

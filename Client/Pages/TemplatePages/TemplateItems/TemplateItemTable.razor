@@ -1,0 +1,200 @@
+﻿@using blazor_wasm.Client.Pages.DialogPages.DialogItems
+@using blazor_wasm.Client.Pages.TemplatePages.TemplateItems.Inherits
+@inherits TemplateItemRenderTree
+
+<ProgressDialog ProgressDto="@_progressDto" @ref="@_progressDialog"/>
+
+@if (TableDto is not null)
+{
+    @if(TableDto.Datas is not null)
+    {
+        <MudTable @ref="@_table"
+                Items="@TableDto.Datas" 
+                FixedHeader="true"
+                FixedFooter="true"
+                Loading="@_loading" 
+                LoadingProgressColor="Color.Info"
+                Dense="@(TableDto.DenseTable ?? false)" 
+                Hover="@(TableDto.HoverTable ?? false)" 
+                Bordered="@(TableDto.BorderTable ?? false)"
+                Striped="@(TableDto.StripeTable ?? false)" 
+                Filter="new Func<Dictionary<string, string>, bool>(FilterFunc1)" 
+                MultiSelection="true"
+                @bind-SelectedItems="@TableDto.SelectedItems"
+                CanCancelEdit="true"
+                IsEditRowSwitchingBlocked="true"
+                RowEditPreview="BackupItem"
+                RowEditCancel="ResetItem"
+                RowEditCommit="CommitItem"
+                RowStyleFunc="RowStyleFunc">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">@TableDto.HeaderTable</MudText>
+                <MudSpacer />
+                <MudTextField @bind-Value="@_searchString" Placeholder="Search" Adornment="Adornment.Start"
+                AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <HeaderContent>
+                @{
+                    Dictionary<string, Type>? typeNames = TableDto.GetNameTypeDictionaryTableEntity();
+                    @if(typeNames is not null)
+                    {
+                        @foreach(var pair in typeNames)
+                        {
+                            <MudTh>
+                                <MudTableSortLabel SortBy="new Func<Dictionary<string, string>, object>(x => x[pair.Key])"
+                                                   Style="text-align:center">
+                                    @pair.Key
+                                </MudTableSortLabel>
+                            </MudTh>
+                        }
+                    }
+                }
+            </HeaderContent>
+            <RowTemplate>
+                @{
+                    Dictionary<string, Type>? typeNames = TableDto.GetNameTypeDictionaryTableEntity();
+                    @if(typeNames is not null)
+                    {
+                        @foreach(var pair in typeNames)
+                        {
+                            <MudTd DataLabel="@pair.Key" Class="clm-row-small">
+                                <MudTextField ReadOnly="true"
+                                                Variant="Variant.Outlined"
+                                                Margin="Margin.Dense"
+                                                Style="margin-top:0px !important"
+                                                @bind-Value="@context[pair.Key]"/>
+                            </MudTd> 
+                            @*
+                            <MudTd DataLabel="@pair.Key" Class="clm-row-small">
+                                @if((pair.Value == typeof(int)) || (Nullable.GetUnderlyingType(pair.Value) == typeof(int)))
+                                {
+                                    <MudTextField ReadOnly="true"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense"
+                                                  Style="margin-top:0px !important"
+                                                  Mask="@(new PatternMask("0000"))" 
+                                                  @bind-Value="@context[pair.Key]"/>
+                                }
+                                else if((pair.Value == typeof(bool)) || (Nullable.GetUnderlyingType(pair.Value) == typeof(bool)))
+                                {                        
+                                    <MudCheckBox ReadOnly="true"
+                                                 Dense="true" 
+                                                 Style="margin-top:0px !important; align-items:center;"  
+                                                 T="string?"                                             
+                                                 @bind-Checked="@context[pair.Key]"/>
+                                }
+                                else
+                                {
+                                    <MudTextField ReadOnly="true" 
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense"      
+                                                  Style="margin-top:0px !important"                          
+                                                  @bind-Value="@context[pair.Key]"/>
+                                }
+                            </MudTd>  
+                            *@  
+                        }
+                    }
+                }
+            </RowTemplate>
+            <RowEditingTemplate>
+                @{
+                    Dictionary<string, Type>? typeNames = TableDto.GetNameTypeDictionaryTableEntity();
+                    @if(typeNames is not null)
+                    {
+                        @foreach(var pair in typeNames)
+                        {
+                             <MudTd DataLabel="@pair.Key" Class="clm-row-small">
+                                @{
+                                    var bindData = TableDto.GetBindValue(pair.Key, true);
+                                    @if(bindData is not null)
+                                    {
+                                        <MudSelect Dense="true" Margin="Margin.Dense" T="string" Variant="Variant.Text" @bind-Value="@context[pair.Key]">
+                                            @foreach (var bindItem in bindData)
+                                            {
+                                                <MudSelectItem Value="@bindItem" />
+                                            }
+                                        </MudSelect>
+                                    }
+                                    else
+                                    {
+                                        <MudTextField Margin="Margin.Dense"
+                                                        Variant="Variant.Outlined"
+                                                        Style="margin-top:0px !important" 
+                                                        @bind-Value="@context[pair.Key]" />
+                                    }
+                                }
+                             </MudTd>
+                            @*
+                            <MudTd DataLabel="@pair.Key" Class="clm-row-small">
+                                @if((pair.Value == typeof(int)) || (Nullable.GetUnderlyingType(pair.Value) == typeof(int)))
+                                {
+                                    <MudTextField Margin="Margin.Dense"
+                                                  Variant="Variant.Outlined"
+                                                  Style="margin-top:0px !important"
+                                                  Mask="@(new PatternMask("0000"))"  
+                                                  @bind-Value="@context[pair.Key]" />
+                                }
+                                else if((pair.Value == typeof(bool)) || (Nullable.GetUnderlyingType(pair.Value) == typeof(bool)))
+                                {                         
+                                    <MudCheckBox Dense="true"
+                                                 Style="margin-top:0px !important; align-items:center"
+                                                 T="string" 
+                                                 CheckedChanged="@((e) => OnChangeCheckBox(context, pair.Key, e))"
+                                                 Checked="@context[pair.Key]"/>
+                                }
+                                else
+                                {
+                                    <MudTextField Margin="Margin.Dense"
+                                                  Variant="Variant.Outlined"
+                                                  Style="margin-top:0px !important" 
+                                                  @bind-Value="@context[pair.Key]" />
+                                }
+                            </MudTd> 
+                            *@   
+                        }
+                    }
+                }
+            </RowEditingTemplate>
+            <FooterContent>
+                <td colspan="100%" style="text-align: right">
+                    @if(TableDto.CTableUrl is not null && string.IsNullOrEmpty(TableDto.CTableUrl).Equals(false))
+                    {
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary"  Size="Size.Small"
+                        OnClick="(async (e) => await OnClickC())">
+                            AddRow
+                        </MudButton>
+                    }
+                    @if(TableDto.RTableUrl is not null && string.IsNullOrEmpty(TableDto.RTableUrl).Equals(false))
+                    {
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh" Color="Color.Secondary"  Size="Size.Small"
+                        OnClick="(async (e) => await OnClickR())">
+                            Read
+                        </MudButton>
+                    }
+                    @if(TableDto.DTableUrl is not null && string.IsNullOrEmpty(TableDto.DTableUrl).Equals(false))
+                    {
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Warning"  Size="Size.Small"
+                        OnClick="(async (e) => await OnClickD())">
+                            Delete
+                        </MudButton>
+                    }
+                    @if(TableDto.UTableUrl is not null && string.IsNullOrEmpty(TableDto.UTableUrl).Equals(false))
+                    {
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Success"  Size="Size.Small"
+                        OnClick="(async (e) => await OnClickSave())">
+                            Update
+                        </MudButton>
+                    }
+                </td>
+            </FooterContent>
+            <PagerContent>
+                <MudTablePager />
+            </PagerContent>
+        </MudTable>
+    }
+}
+
+@code {
+
+}

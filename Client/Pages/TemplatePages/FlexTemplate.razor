@@ -1,0 +1,10 @@
+﻿@page "/template-page/{templateId?}"
+@using blazor_wasm.Client.Pages.TemplatePages.TemplateItems
+
+<CascadingValue Value="@TemplateId">
+    <TemplateItem HttpService="@HttpService" SnackBar="@SnackBar" @ref="@TemplateItem" />
+</CascadingValue>
+
+
+@code {
+}

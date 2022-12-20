@@ -1,0 +1,30 @@
+﻿@if(ProgressDto is not null){
+    <MudDialog @ref="@MudDialog" @bind-IsVisible="@ProgressDto.IsVisible">
+        <DialogContent>
+            <MudProgressLinear Color="Color.Info" 
+                            Size="Size.Large" 
+                            Striped="true"  
+                            Class="my-7"
+                            @bind-Value="@ProgressDto.Value"
+                            @bind-Min="@ProgressDto.MinValue" 
+                            @bind-Max="@ProgressDto.MaxValue">
+                <MudText Typo="Typo.subtitle1" Color="Color.Dark">
+                    @GetTitleContent()
+                </MudText>
+            </MudProgressLinear>
+            @foreach (var text in ProgressDto.TextContent)
+            {
+                <MudText Color="Color.Dark">
+                    @text
+                </MudText>
+            }
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="((e) => CloseDialog())">Close</MudButton>
+        </DialogActions>
+    </MudDialog>
+}
+
+@code {
+
+}

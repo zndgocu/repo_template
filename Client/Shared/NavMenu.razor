@@ -1,0 +1,21 @@
+﻿@using EntityContext.Fms
+
+@if (_menus is not null && _menus.Count > 0)
+{
+    <MudNavMenu>
+        @foreach (var item in _menus)
+        {
+            @if (string.IsNullOrEmpty(item.ParentId))
+            {
+                <CascadingValue Value="@NavigiationManager">
+                    <NavMenuItem MenuItem=@item />
+                </CascadingValue>
+            }
+        }
+    </MudNavMenu>
+}
+
+@code {
+    [Inject]
+    public NavigationManager? NavigiationManager { get; set; }
+}

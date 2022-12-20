@@ -1,0 +1,45 @@
+﻿@using blazor_wasm.Client.Pages.TemplatePages.TemplateItems
+@using blazor_wasm.Client.Pages.TemplatePages.TemplateItems.Inherits
+@inherits TemplateItemRenderTree
+
+@if (TemplateDTO is not null)
+{
+    <div class=@TemplateDTO.GetCss()>
+        @if (TemplateDTO.ShowHeader ?? false)
+        {
+            <p style=@TemplateDTO.HeaderStyle>@TemplateDTO.Header</p>
+        }
+        @if (TemplateDTO.ShowTable ?? false)
+        {
+            @if(HttpService is not null && SnackBar is not null){
+                @if(TemplateDTO.IsTable())
+                {
+                    <CascadingValue Value="@TemplateDTO">
+                        <TemplateItemTable HttpService="@HttpService" SnackBar="@SnackBar" @ref="@Table" />
+                    </CascadingValue>
+                }
+                else
+                {
+                    <CascadingValue Value="@TemplateDTO">
+                        <TemplateItemChart HttpService="@HttpService" SnackBar="@SnackBar" @ref="@Chart" />
+                    </CascadingValue>
+                }
+            }
+        }
+        @if (TemplateDTO.Childs is not null)
+        {
+            @foreach (var template in TemplateDTO.Childs)
+            {
+                @if(template.Id is not null && HttpService is not null && SnackBar is not null){
+                    <CascadingValue Value="@template.Id">
+                        <TemplateItem HttpService="@HttpService" SnackBar="@SnackBar" @ref="@template.Component" />
+                    </CascadingValue>
+                }
+            }
+        }
+    </div>
+}
+
+
+@code {
+}
